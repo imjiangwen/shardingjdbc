@@ -1,0 +1,88 @@
+server:
+  # 端口
+  port: 1818
+  undertow:
+    # 编码
+    uri-encoding: UTF-8
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  resources:
+    # 静态资源文件夹
+    static-locations: classpath:/
+  # 序列化
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      #忽略无法转换的对象
+      fail_on_empty_beans: false
+    deserialization:
+      #允许对象忽略json中不存在的属性
+      fail_on_unknown_properties: false
+    #设置空如何序列化
+    defaultPropertyInclusion: ALWAYS
+    parser:
+      #允许出现特殊字符和转义符
+      allow_unquoted_control_chars: true
+      #允许出现单引号
+      allow_single_quotes: true
+
+# 分库
+sharding:
+  jdbc:
+    datasource:
+      names: shard1,shard2
+      shard1:
+        type: org.apache.commons.dbcp.BasicDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/shard1
+        username: root
+        password: root
+      shard2:
+        type: org.apache.commons.dbcp.BasicDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/shard2
+        username: root
+        password: root
+    config:
+      sharding:
+        # 分表策略
+        tables:
+          # 分库分表
+          table_one:
+            actual-data-nodes: shard$->{1..2}.table_one_$->{1..2}
+            table-strategy:
+              standard:
+                sharding-column: id
+                precise-algorithm-class-name: com.shardingjdbc.config.sharding.DataTablePreciseRule
+          # 只分库
+          table_two:
+            actual-data-nodes: shard$->{1..2}.table_two
+
+        # 分库策略
+        default-database-strategy:
+          standard:
+            sharding-column: id
+            precise-algorithm-class-name: com.shardingjdbc.config.sharding.DataBasePreciseRule
+
+# mybatis-plus 的分页插件
+pagehelper:
+  helper-dialect: mysql
+  params: count=countSql
+  reasonable: false
+  support-methods-arguments: true
+
+# mybatis-plus
+mybatis-plus:
+  mapper-locations: /mapper/**/**.xml
+  typeAliasesPackage: com.shardingjdbc.domain
+  global-config:
+    id-type: 3
+    field-strategy: 2
+    db-column-underline: true
+    refresh-mapper: true
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    call-setters-on-nulls: true
