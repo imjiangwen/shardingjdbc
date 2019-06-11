@@ -53,16 +53,21 @@ sharding:
         default-database-strategy:
           standard:
             sharding-column: id
+            # 自定义的分片策略
             precise-algorithm-class-name: com.shardingjdbc.config.sharding.DataBasePreciseRule
         # 分表策略
         tables:
           # 分库分表
           table_one:
             actual-data-nodes: shard$->{1..2}.table_one_$->{1..2}
+            # 精确分片算法，对应PreciseShardingAlgorithm
             table-strategy:
               standard:
                 sharding-column: id
+                # 自定义的分片策略
                 precise-algorithm-class-name: com.shardingjdbc.config.sharding.DataTablePreciseRule
+            # 范围分片算法，对应RangeShardingAlgorithm，略
+            # 复合分片算法，对应ComplexKeysShardingAlgorithm，略
 
 
 # mybatis-plus 的分页插件
