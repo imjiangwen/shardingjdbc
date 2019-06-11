@@ -47,6 +47,13 @@ sharding:
         password: root
     config:
       sharding:
+        # 默认数据源（未设置分表策略的表将默认用此数据源）
+        default-datasource-name: shard1
+        # 默认分库策略
+        default-database-strategy:
+          standard:
+            sharding-column: id
+            precise-algorithm-class-name: com.shardingjdbc.config.sharding.DataBasePreciseRule
         # 分表策略
         tables:
           # 分库分表
@@ -56,15 +63,7 @@ sharding:
               standard:
                 sharding-column: id
                 precise-algorithm-class-name: com.shardingjdbc.config.sharding.DataTablePreciseRule
-          # 只分库
-          table_two:
-            actual-data-nodes: shard$->{1..2}.table_two
 
-        # 分库策略
-        default-database-strategy:
-          standard:
-            sharding-column: id
-            precise-algorithm-class-name: com.shardingjdbc.config.sharding.DataBasePreciseRule
 
 # mybatis-plus 的分页插件
 pagehelper:
